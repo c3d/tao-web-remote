@@ -1,0 +1,29 @@
+// WebRemote module definition
+//
+// Control presentations from a web browser (computer, tablet, smartphone) 
+//
+// Copyright 2013 Taodyne SAS
+
+module_description
+    id "2EA5CF1D-5126-4966-ACF4-9916391F5689" 
+    name "Web Remote Control"
+    description "Control presentations from a web browser (computer, tablet, smartphone)"
+    import_name "WebRemote"
+    author "Taodyne SAS"
+    website "http://www.taodyne.com"
+    version 1.0
+
+module_description "fr",
+    name "Télécommande Web"
+    description "Télécommandez vos présentations depuis un navigateur web (ordinateur, tablette, smartphone)"
+
+import NodeJS
+
+web_remote_start ->
+    nodejs "var DOCUMENT_DIR='" & document_dir & "'; require('" & module_dir & "/web_remote.js');"
+    on "pagechange",
+        nodejs_writeln "SetPageName('" & page_label & "', " & text page_number & ");"
+    cached 1.0,
+        for i in 1..10 loop
+            save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".png", 2.0
+        nodejs_writeln "SetPageCount(" & text page_count & ");"
