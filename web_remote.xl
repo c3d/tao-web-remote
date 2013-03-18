@@ -32,7 +32,7 @@ web_remote_start ->
     if wrs_count = 2 then
         cached 1.0,
             for i in 1..page_count loop
-                save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".png", 2.0
+                save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".png", 3.0
             nodejs_writeln "SetPageCount(" & text page_count & ");"
             nodejs_writeln "SetPageName('" & page_label & "', 1);"
 
