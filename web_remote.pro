@@ -25,11 +25,11 @@ include(../modules_doc.pri)
 #  npm install express socket.io
 #  find . -name build | xargs rm -rf
 # Binaries are re-created for each platform by 'npm rebuild'.
-PRE_TARGETDEPS = node_modules
-node_modules.target = node_modules
-node_modules.commands = npm install express@3.1.0 socket.io@0.9.13
+PRE_TARGETDEPS = node_modules/.inst
+node_modules.target = node_modules/.inst
+node_modules.commands = npm install express@3.1.0 socket.io@0.9.13 && touch node_modules/.inst
 QMAKE_EXTRA_TARGETS += node_modules
-distclean_rm_node_modules.commands = rm -rf ./node_modules
+distclean_rm_node_modules.commands = rm -rf ./node_modules/* ./node_modules/.inst
 distclean.depends = distclean_rm_node_modules
 QMAKE_EXTRA_TARGETS += distclean distclean_rm_node_modules
 
