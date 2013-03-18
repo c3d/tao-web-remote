@@ -19,12 +19,20 @@ module_description "fr",
 
 import NodeJS
 
+wrs_module_dir := module_dir // #2618
+wrs_count -> 0
 web_remote_start ->
-    nodejs "var DOCUMENT_DIR='" & document_dir & "'; require('" & module_dir & "/web_remote.js');"
+    nodejs "var DOCUMENT_DIR='" & document_dir & "'; require('" & wrs_module_dir & "/web_remote.js');"
     on "pagechange",
         nodejs_writeln "SetPageName('" & page_label & "', " & text page_number & ");"
-    cached 1.0,
-        for i in 1..10 loop
-            save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".png", 2.0
-        nodejs_writeln "SetPageCount(" & text page_count & ");"
-        nodejs_writeln "SetPageName('" & page_label & "', 1);"
+        nodejs_writeln "SetPageCount(" & text page_count & ");" // FIXME
+    if wrs_count <= 2 then
+        wrs_count := wrs_count + 1
+        refresh 0
+    if wrs_count = 2 then
+        cached 1.0,
+            for i in 1..page_count loop
+                save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".png", 2.0
+            nodejs_writeln "SetPageCount(" & text page_count & ");"
+            nodejs_writeln "SetPageName('" & page_label & "', 1);"
+
