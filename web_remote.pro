@@ -10,6 +10,12 @@
 # (C) 2013 Taodyne SAS
 # ******************************************************************************
 
+!build_pass:!system(bash -c \"npm -v\" >/dev/null) {
+  error(npm not found. Did you install NodeJS? \
+        [\'sudo apt-get install nodejs\' or \'sudo port install nodejs\' \
+        or from http://nodejs.org/])
+}
+
 MODINSTDIR = web_remote
 
 include(../modules.pri)
