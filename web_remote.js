@@ -38,19 +38,19 @@ io.sockets.on('connection', function(socket) {
 
 var pagename = '';
 var pagenum = 1;
-function SetPageName(name, num) {
+function setPageName(name, num) {
    pagename = name;
    pagenum = num;
    io.sockets.emit('currentpage', { num:num, name:name }); 
 }
 
 var pagecount = 0;
-function SetPageCount(t) {
+function setPageCount(t) {
     pagecount = t;
-    SendPageCount();
+    sendPageCount();
 }
 
-function SendPageCount() {
+function sendPageCount() {
     io.sockets.emit('pagecount', pagecount);
 }
 

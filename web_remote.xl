@@ -24,8 +24,7 @@ wrs_count -> 0
 web_remote_start ->
     nodejs "var DOCUMENT_DIR='" & document_dir & "'; require('" & wrs_module_dir & "/web_remote.js');"
     on "pagechange",
-        nodejs_writeln "SetPageName('" & page_label & "', " & text page_number & ");"
-        nodejs_writeln "SetPageCount(" & text page_count & ");" // FIXME
+        nodejs_writeln "setPageName('" & page_label & "', " & text page_number & ");"
     if wrs_count <= 2 then
         wrs_count := wrs_count + 1
         refresh 0
@@ -33,6 +32,6 @@ web_remote_start ->
         cached 1.0,
             for i in 1..page_count loop
                 save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".png", 3.0
-            nodejs_writeln "SetPageCount(" & text page_count & ");"
-            nodejs_writeln "SetPageName('" & page_label & "', 1);"
+            nodejs_writeln "setPageCount(" & text page_count & ");"
+            nodejs_writeln "setPageName('" & page_label & "', 1);"
 
