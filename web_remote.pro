@@ -1,3 +1,14 @@
+# ******************************************************************************
+#  web_remote.pro                                                   Tao project
+# ******************************************************************************
+# File Description:
+# Qt build file for the Web Remote module
+# ******************************************************************************
+# This software is property of Taodyne SAS - Confidential
+# Ce logiciel est la propriété de Taodyne SAS - Confidentiel
+# (C) 2013 Jerome Forissier <jerome@taodyne.com>
+# (C) 2013 Taodyne SAS
+# ******************************************************************************
 
 MODINSTDIR = web_remote
 
@@ -20,11 +31,7 @@ DOXYLANG = en,fr
 include(../modules_doc.pri)
 
 # node_modules: the NodeJS modules directory
-# Created by 'npm install'; platform-specific binaries are not committed
-# into the git repository:
-#  npm install express socket.io
-#  find . -name build | xargs rm -rf
-# Binaries are re-created for each platform by 'npm rebuild'.
+# Created by 'npm install' which REQUIRES AN INTERNET CONNECTION
 PRE_TARGETDEPS = node_modules/.inst
 node_modules.target = node_modules/.inst
 node_modules.commands = npm install express@3.1.0 socket.io@0.9.13 && touch node_modules/.inst
