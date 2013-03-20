@@ -7,7 +7,8 @@
 module_description
     id "2EA5CF1D-5126-4966-ACF4-9916391F5689" 
     name "Web Remote Control"
-    description "Control presentations from a web browser (computer, tablet, smartphone)"
+    description "Control presentations from a web browser (computer, " &
+                "tablet, smartphone)"
     import_name "WebRemote"
     author "Taodyne SAS"
     website "http://www.taodyne.com"
@@ -15,7 +16,8 @@ module_description
 
 module_description "fr",
     name "Télécommande Web"
-    description "Télécommandez vos présentations depuis un navigateur web (ordinateur, tablette, smartphone)"
+    description "Télécommandez vos présentations depuis un navigateur web " &
+                "(ordinateur, tablette, smartphone)"
 
 import NodeJS
 
