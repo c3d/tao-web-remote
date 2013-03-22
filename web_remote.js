@@ -1,16 +1,64 @@
-// Caller must define DOCUMENT_DIR
-
-var PORT = 8000;
+// Caller must define DOCUMENT_DIR.
+// HTTP_PORT may be set to the desired port for the HTTP server.
 var express = require('express'),
     app = express(),
     http = require('http'),
-    fs = require('fs'),
     util = require('util'),
-    server = http.createServer(app),
-    io = require('socket.io').listen(server);
+    server = http.createServer(app);
+var io = null;
 
-server.listen(PORT);
-console.log('HTTP server ready: http://localhost:' + PORT + '/');
+
+//
+// Start HTTP server and Socket.IO
+//
+
+var port = (typeof(HTTP_PORT) == 'undefined') ? 8000 : HTTP_PORT;
+var retryPort = port;
+server.on('error', function(err) {
+    if (retryPort === port + 10) {
+        // No luck, ask for a dynamic port
+        retryPort = 0;
+    } else if (retryPort === 0) {
+        // listen(0) failed
+        console.error('web_remote.js Could not start server');
+        return;
+    } else {
+        retryPort++;
+    }
+    server.listen(retryPort);
+});
+server.on('listening', function() {
+    port = server.address().port;
+    HTTP_PORT = port;
+    console.log('WebRemote: Server started: http://localhost:' + HTTP_PORT);
+
+    // If io is created before server is listening, it lorgs a warning in case
+    // the port is not available.
+    io = require('socket.io').listen(server);
+    io.set('log level', 1);
+    io.sockets.on('connection', function(socket) {
+        socket.emit('pagenames', pageNames);
+        socket.emit('currentpage', currentPage);
+        socket.on('next', function() {
+            process.stdout.write('tao.next_page\n');
+        });
+        socket.on('prev', function() {
+            process.stdout.write('tao.previous_page\n');
+        });
+        socket.on('gotopage', function(n) {
+            process.stdout.write('tao.goto_page page_name ' + n +' ; refresh 0\n');
+        });
+    });
+
+    console.log('tao.WEB_REMOTE_LOCAL_PORT := ' + HTTP_PORT);
+    console.log('tao.WEB_REMOTE_LOCAL_URL := "http://localhost:' + HTTP_PORT +'"');
+});
+server.listen(port);
+
+
+//
+// Define routing for HTTP requests
+//
 
 app.get('/',
         function(req, rsp) {
@@ -27,31 +75,27 @@ app.configure(function(){
     app.use(app.router);
 });
 
-io.set('log level', 1);
-io.sockets.on('connection', function(socket) {
-    socket.emit('currentpage', { num:pagenum, name:pagename });
-    socket.emit('pagecount', pagecount);
-    socket.on('next', function(m) { console.log('tao.next_page'); });
-    socket.on('prev', function(m) { console.log('tao.previous_page'); });
-    socket.on('gotopage', function(n) { console.log('tao.goto_page page_name ' + n +' ; refresh 0'); });
-});
 
-var pagename = '';
-var pagenum = 1;
-function setPageName(name, num) {
-   pagename = name;
-   pagenum = num;
-   io.sockets.emit('currentpage', { num:num, name:name }); 
+//
+// Functions called by Tao
+//
+
+var currentPage = 1;
+function setCurrentPage(pagenum) {
+    currentPage = pagenum;
+    if (io)
+        io.sockets.emit('currentpage', currentPage);
 }
 
-var pagecount = 0;
-function setPageCount(t) {
-    pagecount = t;
-    sendPageCount();
+// Page 0 is not used
+var pageNames = [ '' ];
+function setPageName(pagenum, pagename) {
+    pageNames[pagenum] = pagename;
 }
 
-function sendPageCount() {
-    io.sockets.emit('pagecount', pagecount);
+function sendPageNames() {
+    if (io)
+        io.sockets.emit('pagenames', pageNames);
 }
 
 process.stdin.resume();
@@ -61,5 +105,3 @@ process.stdin.on('data', function(chunk) {
     buffer = buffer.replace(/[\n\r]/g, '').trim();
     eval(buffer);
 });
-
-

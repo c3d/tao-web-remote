@@ -18,16 +18,22 @@
         <script type="text/javascript">
             var socket = io.connect();
             var connected = false;
+            var pageNames = [ '' ];
             socket.on('connect', function() { connected = true; });
             socket.on('currentpage', function(p) {
-                document.getElementById('CurrentPageThumbnail').innerHTML = '<img src="thumbnails/page' + p.num + '.png" />';
-                document.getElementById('CurrentPageCaption').innerHTML = p.num + '. ' + p.name;
+                document.getElementById('CurrentPageThumbnail').innerHTML = '<img src="thumbnails/page' + p + '.png" />';
+                document.getElementById('CurrentPageCaption').innerHTML = p + '. ' + pageNames[p];
             });
-            socket.on('pagecount', function(n) {
+            socket.on('pagenames', function(names) {
                 var html = '';
                 var thumb = '';
-                for (var i = 1; i <= n; i++) {
-                    thumb += '<a href="javascript:void(0);" onclick="gotoPage(' + i + ');"><img src="thumbnails/page' + i + '.png" title="Page ' + i + '" /></a>';
+                pageNames = names;
+                console.log('pageNames', pageNames);
+                for (var i = 1; i < pageNames.length; i++) {
+                    thumb += '<a href="javascript:void(0);" onclick="gotoPage('
+                           + i + ');"><img src="thumbnails/page' + i
+                           + '.png" title="Page ' + i + ': ' + pageNames[i]
+                           + '" /></a>';
                 }
                 document.getElementById('Thumbnails').innerHTML = thumb;
                
