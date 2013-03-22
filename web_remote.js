@@ -62,12 +62,13 @@ server.listen(port);
 
 app.get('/',
         function(req, rsp) {
-            rsp.sendfile(__dirname + '/web_remote.html');
+            rsp.sendfile(__dirname + '/static/web_remote.html');
         });
 app.configure(function(){
     app.use(express.methodOverride());
     app.use(express.bodyParser());
     app.use('/thumbnails', express.static(DOCUMENT_DIR + '/thumbnails'));
+    app.use('/static', express.static(__dirname + '/static'));
     app.use(express.errorHandler({
         dumpExceptions: true,
         showStack: true

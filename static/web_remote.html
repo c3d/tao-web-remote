@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <style>
+            body
+            {
+                text-shadow:#fff 0 1px 0;
+                color:#2c2c2c;
+                font-family:"Lucida Grande","Lucida Sans Unicode",Helvetica,Arial;
+                font-weight:400;
+                background-image:url(static/bg.jpg);
+            }
+            img.main_thumbnail
+            {
+                border: 6px solid rgb(226, 217, 192);
+                margin:2px;
+            }
+            img.thumbnail
+            {
+                border: 6px solid rgb(226, 217, 192);
+                margin:2px;
+            }
+            img.thumbnail:hover
+            {
+                border: 6px solid rgb(61, 154, 186);
+                margin:2px;
+            }
+            img.hl_thumbnail
+            {
+                border: 6px solid rgb(166, 61, 59);
+                margin:2px;
+            }
+            img.hl_thumbnail:hover
+            {
+                border: 6px solid rgb(61, 154, 186);
+                margin:2px;
+            }
+        </style>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            var socket = io.connect();
+            var connected = false;
+            var pageNames = [ '', '' ];
+            var currentPage = 1;
+            socket.on('connect', function() { connected = true; });
+            socket.on('currentpage', function(p) {
+                document.getElementById('CurrentPageThumbnail').innerHTML = '<img width="200px" class="main_thumbnail" src="thumbnails/page' + p + '.png" />';
+                document.getElementById('CurrentPageCaption').innerHTML = p + '. ' + pageNames[p];
+                updateThumbnails(p);
+            });
+            socket.on('pagenames', function(names) {
+                pageNames = names;
+                updateThumbnails(currentPage);
+            });
+            function nextPage() { if (connected) socket.emit('next'); }
+            function prevPage() { if (connected) socket.emit('prev'); }
+            function gotoPage(n) { if (connected) socket.emit('gotopage', n); }
+            function updateThumbnails(highlighted) {
+                var thumb = '';
+                for (var i = 1; i < pageNames.length; i++) {
+                    thumb += '<a href="javascript:void(0);" onclick="gotoPage('
+                           + i + ');"><img class="'
+                    if (i === highlighted)
+                        thumb += "hl_";
+                    thumb += 'thumbnail" src="thumbnails/page' + i
+                           + '.png" title="Page ' + i + ': ' + pageNames[i]
+                           + '" /></a>';
+                }
+                document.getElementById('Thumbnails').innerHTML = thumb;
+            }
+        </script>
+    </head>
+    <body>
+        <center>
+        <table>
+            <tr>
+                <td align="right">
+                    <a href='#' onClick="prevPage();">
+                        <img title="Go to previous page" width="60%" src="static/left.jpg" />
+                    </a>
+                </td>
+                <td width="1px" id="CurrentPageThumbnail" />
+                <td align="left">
+                    <a href='#' onClick="nextPage();">
+                        <img title="Go to next page" width="60%" src="static/right.jpg" />
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" align="center" id="CurrentPageCaption" />
+            </tr>
+        </table>
+        <br />
+        <span id="Thumbnails"></span>
+        </center>
+    </body>
+</html>

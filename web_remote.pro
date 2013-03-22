@@ -57,3 +57,8 @@ install_extra.path = $${MODINSTPATH}
 QMAKE_EXTRA_TARGETS += install_extra
 INSTALLS += install_extra
 
+
+install_static.files = ./static
+install_static.path = $${MODINSTPATH}
+QMAKE_EXTRA_TARGETS += install_static
+INSTALLS += install_static
