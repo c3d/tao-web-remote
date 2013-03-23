@@ -41,12 +41,16 @@
             var pageNames = [ '', '' ];
             var currentPage = 1;
             socket.on('currentpage', function(p) {
-                document.getElementById('CurrentPageThumbnail').innerHTML = '<img width="200px" class="main_thumbnail" src="thumbnails/page' + p + '.png" />';
+                document.getElementById('CurrentPageThumbnail').innerHTML = '<img width="200px" class="main_thumbnail" src="thumbnails/page' + p + '.png#' + updateCount + '" />';
                 document.getElementById('CurrentPageCaption').innerHTML = p + '. ' + pageNames[p];
                 updateThumbnails(p);
             });
+            var updateCount = 0;
             socket.on('pagenames', function(names) {
                 pageNames = names;
+                // This should make the browser re-check/re-load the images
+                // (tested with Firefox)
+                updateCount++;
                 updateThumbnails(currentPage);
             });
             function nextPage() { socket.emit('next'); }
@@ -60,7 +64,7 @@
                     if (i === highlighted)
                         thumb += "hl_";
                     thumb += 'thumbnail" src="thumbnails/page' + i
-                           + '.png" title="Page ' + i + ': ' + pageNames[i]
+                           + '.png#' + updateCount + '" title="Page ' + i + ': ' + pageNames[i]
                            + '" /></a>';
                 }
                 document.getElementById('Thumbnails').innerHTML = thumb;
