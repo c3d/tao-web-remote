@@ -38,10 +38,8 @@
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             var socket = io.connect();
-            var connected = false;
             var pageNames = [ '', '' ];
             var currentPage = 1;
-            socket.on('connect', function() { connected = true; });
             socket.on('currentpage', function(p) {
                 document.getElementById('CurrentPageThumbnail').innerHTML = '<img width="200px" class="main_thumbnail" src="thumbnails/page' + p + '.png" />';
                 document.getElementById('CurrentPageCaption').innerHTML = p + '. ' + pageNames[p];
@@ -51,9 +49,9 @@
                 pageNames = names;
                 updateThumbnails(currentPage);
             });
-            function nextPage() { if (connected) socket.emit('next'); }
-            function prevPage() { if (connected) socket.emit('prev'); }
-            function gotoPage(n) { if (connected) socket.emit('gotopage', n); }
+            function nextPage() { socket.emit('next'); }
+            function prevPage() { socket.emit('prev'); }
+            function gotoPage(n) { socket.emit('gotopage', n); }
             function updateThumbnails(highlighted) {
                 var thumb = '';
                 for (var i = 1; i < pageNames.length; i++) {
