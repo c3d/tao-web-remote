@@ -28,9 +28,11 @@ server.on('error', function(err) {
     server.listen(retryPort);
 });
 server.on('listening', function() {
+    var addr = getLocalIp();
     port = server.address().port;
     HTTP_PORT = port;
-    console.log('WebRemote: Server started: http://localhost:' + HTTP_PORT);
+    WEB_REMOTE_LOCAL_URL = 'http://' + addr + '/' + HTTP_PORT;
+    console.log('WebRemote: Server started: ' + WEB_REMOTE_LOCAL_URL);
 
     // If io is created before server is listening, it lorgs a warning in case
     // the port is not available.
@@ -51,7 +53,7 @@ server.on('listening', function() {
     });
 
     console.log('tao.WEB_REMOTE_LOCAL_PORT := ' + HTTP_PORT);
-    console.log('tao.WEB_REMOTE_LOCAL_URL := "http://localhost:' + HTTP_PORT +'"');
+    console.log('tao.WEB_REMOTE_LOCAL_URL := "' + WEB_REMOTE_LOCAL_URL +'"');
 });
 server.listen(port);
 
@@ -106,3 +108,27 @@ process.stdin.on('data', function(chunk) {
     buffer = buffer.replace(/[\n\r]/g, '').trim();
     eval(buffer);
 });
+
+
+//
+// Helper functions
+//
+
+function getLocalIp() {
+    function startsWith(str1, str2) {
+        return (str1.slice(0, str2.length) == str2);
+    }
+    var os = require('os');
+    var ifaces = os.networkInterfaces();
+    for (var dev in ifaces) {
+        for (var i in ifaces[dev]) {
+            details = ifaces[dev][i];
+            if (details.family === 'IPv4') {
+                if (startsWith(details.address, '127.') === false) {
+                    return details.address;
+                }
+            }
+        }
+    }
+    return 'localhost';
+}
