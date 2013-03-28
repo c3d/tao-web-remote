@@ -1,12 +1,12 @@
-// Caller must define DOCUMENT_DIR.
-// HTTP_PORT may be set to the desired port for the HTTP server.
-
-// TODO make this optional / configurable from Tao
-// Public gateway: hostname and port nomber of Socket.IO server
-// The emodule uses the gateway to register and obtain a public URL
-var GATEWAY  = 'http://localhost:8800';
-// TODO make this configurable from Tao
-var SEED = 'WebRemote module';
+// Caller must define:
+// - DOCUMENT_DIR
+// - LOCAL_CB
+// - PUBLIC_CB
+//
+// Optional variables:
+// - LOCAL_PORT
+// - GATEWAY_URL
+// - SEED
 
 var express = require('express'),
     app = express(),
@@ -21,7 +21,7 @@ var gwsocket = null;
 // Start HTTP server and Socket.IO (server)
 //
 
-var port = (typeof(HTTP_PORT) == 'undefined') ? 8000 : HTTP_PORT;
+var port = (typeof(LOCAL_PORT) == 'undefined') ? 8000 : LOCAL_PORT;
 var retryPort = port;
 server.on('error', function(err) {
     if (retryPort === port + 10) {
@@ -37,11 +37,6 @@ server.on('error', function(err) {
     server.listen(retryPort);
 });
 server.on('listening', function() {
-    var addr = getLocalIp();
-    port = server.address().port;
-    HTTP_PORT = port;
-    WEB_REMOTE_LOCAL_URL = 'http://' + addr + '/' + HTTP_PORT;
-    console.log('WebRemote: Server started: ' + WEB_REMOTE_LOCAL_URL);
 
     // If io is created before server is listening, it logs a warning in case
     // the port is not available.
@@ -51,8 +46,33 @@ server.on('listening', function() {
         addHandlers(socket);
     });
 
-    console.log('tao.WEB_REMOTE_LOCAL_PORT := ' + HTTP_PORT);
-    console.log('tao.WEB_REMOTE_LOCAL_URL := "' + WEB_REMOTE_LOCAL_URL +'"');
+    var addr = getLocalIp();
+    port = server.address().port;
+    var localUrl = 'http://' + addr + '/' + port;
+    console.log('tao.' + LOCAL_CB + ' ' + port + ', "' + localUrl + '"');
+
+    // Connect to the public gateway
+    if (typeof(GATEWAY_URL) !== 'undefined' && GATEWAY_URL !== '') {
+
+        var seed = '';
+        if (typeof(SEED) === 'undefined')
+            seed = SEED;
+        prezat.connectToPrezGateway(GATEWAY_URL, seed, port, function(err, socket, publicUrl) {
+            console.log('tao.' + PUBLIC_CB + ' "' + publicUrl + '"');
+
+            gwsocket = socket;
+            // For user messages forwarded from gateway
+            addHandlers(socket);
+
+            socket.on('newclientconnection', function(param, callback) {
+                // A new client has connected to the gateway, it needs
+                // page information
+                var notifications = [ {name: ':pagenames', value: pageNames},
+                                      {name: ':currentpage', value: currentPage } ];
+                callback(notifications);
+            });
+        });
+    }
 });
 server.listen(port);
 
@@ -112,27 +132,6 @@ process.stdin.on('data', function(chunk) {
     eval(buffer);
 });
 
-//
-// Connect to the public gateway
-//
-
-if (typeof(GATEWAY) !== 'undefined') {
-
-    prezat.connectToPrezGateway(GATEWAY, SEED, port, function(err, socket, publicUrl) {
-        console.log('Public url is ' + publicUrl);
-        gwsocket = socket;
-        // For user messages forwarded from gateway
-        addHandlers(socket);
-
-        socket.on('newclientconnection', function(param, callback) {
-            // A new client has connected to the gateway, it needs
-            // page information
-            var notifications = [ {name: ':pagenames', value: pageNames},
-                                  {name: ':currentpage', value: currentPage } ];
-            callback(notifications);
-        });
-    });
-}
 
 //
 // Helper functions

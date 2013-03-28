@@ -19,30 +19,54 @@ module_description "fr",
     description "Télécommandez vos présentations depuis un navigateur web " &
                 "(ordinateur, tablette, smartphone)"
 
-// Desired port for the HTTP server. If not available, we try 10 ports
-// in a row, and if we still can't find a port we request a dynamically
-// allocated port form the system.
+
+// [in/out]
+// The desired port for the HTTP server. 8000 by defaut, 0 to get
+// a port assigned by the system. If the specified port is in use, the program
+// tries 10 consecutive ports and finally tries LOCAL_PORT = 0.
 // The variable is set to the actual port used when the server is ready.
 WEB_REMOTE_LOCAL_PORT -> 8000
 
-// Set when server is ready
-WEB_REMOTE_LOCAL_URL -> ""
+// Set this if you want to register with a gateway and get a public URL
+// to access your presentation.
+// Example: http://prez.at
+WEB_REMOTE_GATEWAY_URL -> ""
 
-// Flag: register for a public URL
-WEB_REMOTE_PUBLIC_GATEWAY_URL -> "http://localhost:8800"
-// Set when the public URL is ready
+// An arbitratry string used by the gateway to generate a prez ID
+// on registration. If SEED is unset or empty, a random ID is allocated.
+// Using the same SEED several time usually results in the gateway
+// sending the same ID (except if the ID is already in use), so it's
+// convenient for testing.
+WEB_REMOTE_SEED -> ""
+
+
+// Set these variables to the name of the functions you want called when the
+// local and public server are ready, respectively
+// Takes (Port:integer, LocalUrl:text)
+WEB_REMOTE_LOCAL_URL_CB -> "wrs_local_cb"
+// Takes (PublicUrl:text)
+WEB_REMOTE_PUBLIC_URL_CB -> "wrs_public_cb"
+
+// Set by the default callbacks above
+WEB_REMOTE_LOCAL_URL -> ""
 WEB_REMOTE_PUBLIC_URL -> ""
 
 import NodeJS
 import PrezAt
 
 // #2618 module_dir is OK here but not if called from within web_remote_start
-wrs_js_src := "var DOCUMENT_DIR='" & document_dir & "'; var HTTP_PORT=" & text WEB_REMOTE_LOCAL_PORT
-wrs_js_src := wrs_js_src & "; var PREZ_AT_JS_PATH='" & prez_at_js_path & "'; require('" & module_dir & "/web_remote.js');"
+wrs_js_src := "var DOCUMENT_DIR='" & document_dir & "'; var HTTP_PORT=" & text WEB_REMOTE_LOCAL_PORT & ";"
+wrs_js_src := wrs_js_src & " var GATEWAY_URL='" & WEB_REMOTE_GATEWAY_URL & "';"
+wrs_js_src := wrs_js_src & " var PREZ_AT_JS_PATH='" & prez_at_js_path & "';"
+wrs_js_src := wrs_js_src & " var SEED='" & WEB_REMOTE_SEED & "';"
+wrs_js_src := wrs_js_src & " require('" & module_dir & "/web_remote.js');"
+js_src := ""
 wrs_count -> 0
 web_remote_start ->
     locally
-        nodejs wrs_js_src
+        js_src := "var LOCAL_CB='" & WEB_REMOTE_LOCAL_URL_CB & "'; "
+        js_src := js_src & "var PUBLIC_CB='" & WEB_REMOTE_PUBLIC_URL_CB & "'; " & wrs_js_src
+        nodejs js_src
     on "pagechange",
         nodejs_writeln "setCurrentPage(" & text page_number & ");"
     if wrs_count <= 2 then
@@ -56,3 +80,11 @@ web_remote_start ->
                 nodejs_writeln "setPageName(" & text i & ", '" & text_replace(page_name i, "'", "\'") & "');"
             // In case a client has connected before this point
             nodejs_writeln "sendPageNames();"
+
+wrs_local_cb Port:integer, LocalUrl:text ->
+    writeln "WebRemote: local address is " & LocalUrl
+    WEB_REMOTE_LOCAL_URL := LocalUrl
+
+wrs_public_cb PublicUrl:text ->
+    writeln "WebRemote: public address is " & PublicUrl
+    WEB_REMOTE_PUBLIC_URL := LocalUrl
