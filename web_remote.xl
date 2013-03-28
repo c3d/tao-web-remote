@@ -30,7 +30,8 @@ WEB_REMOTE_LOCAL_PORT -> 8000
 // Set this if you want to register with a gateway and get a public URL
 // to access your presentation.
 // Example: http://prez.at
-WEB_REMOTE_GATEWAY_URL -> ""
+WEB_REMOTE_GATEWAY_URL -> ''
+WEB_REMOTE_GATEWAY_URL := env "TAO_GATEWAY"
 
 // An arbitratry string used by the gateway to generate a prez ID
 // on registration. If SEED is unset or empty, a random ID is allocated.
