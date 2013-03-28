@@ -55,7 +55,7 @@ server.on('listening', function() {
     if (typeof(GATEWAY_URL) !== 'undefined' && GATEWAY_URL !== '') {
 
         var seed = '';
-        if (typeof(SEED) === 'undefined')
+        if (typeof(SEED) !== 'undefined')
             seed = SEED;
         prezat.connectToPrezGateway(GATEWAY_URL, seed, port, function(err, socket, publicUrl) {
             console.log('tao.' + PUBLIC_CB + ' "' + publicUrl + '"');
