@@ -40,7 +40,7 @@ include(../modules_doc.pri)
 # Created by 'npm install' which REQUIRES AN INTERNET CONNECTION
 PRE_TARGETDEPS = node_modules/.inst
 node_modules.target = node_modules/.inst
-node_modules.commands = npm install express@3.1.0 socket.io@0.9.13 && touch node_modules/.inst
+node_modules.commands = npm install express@3.1.0 socket.io@0.9.13 socket.io-client@0.9.11 && touch node_modules/.inst
 QMAKE_EXTRA_TARGETS += node_modules
 distclean_rm_node_modules.commands = rm -rf ./node_modules/* ./node_modules/.inst
 distclean.depends = distclean_rm_node_modules

@@ -37,25 +37,31 @@
         </style>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/javascript">
-            var socket = io.connect();
+            function socketio_url() {
+                var re = /\/([a-z]+)(?:$|\/)/;
+                var match = re.exec(window.location.pathname);
+                var id = match ? ('/' + match[1])  : '';
+                return window.location.protocol + '//' + window.location.host + id;
+            }
+            var socket = io.connect(socketio_url());
             var pageNames = [ '', '' ];
             var currentPage = 1;
-            socket.on('currentpage', function(p) {
+            socket.on(':currentpage', function(p) {
                 document.getElementById('CurrentPageThumbnail').innerHTML = '<img width="200px" class="main_thumbnail" src="thumbnails/page' + p + '.jpg#' + updateCount + '" />';
                 document.getElementById('CurrentPageCaption').innerHTML = p + '. ' + pageNames[p];
                 updateThumbnails(p);
             });
             var updateCount = 0;
-            socket.on('pagenames', function(names) {
+            socket.on(':pagenames', function(names) {
                 pageNames = names;
                 // This should make the browser re-check/re-load the images
                 // (tested with Firefox)
                 updateCount++;
                 updateThumbnails(currentPage);
             });
-            function nextPage() { socket.emit('next'); }
-            function prevPage() { socket.emit('prev'); }
-            function gotoPage(n) { socket.emit('gotopage', n); }
+            function nextPage() { socket.emit(':next'); }
+            function prevPage() { socket.emit(':prev'); }
+            function gotoPage(n) { socket.emit(':gotopage', n); }
             function updateThumbnails(highlighted) {
                 var thumb = '';
                 for (var i = 1; i < pageNames.length; i++) {

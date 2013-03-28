@@ -1,15 +1,24 @@
 // Caller must define DOCUMENT_DIR.
 // HTTP_PORT may be set to the desired port for the HTTP server.
+
+// TODO make this optional / configurable from Tao
+// Public gateway: hostname and port nomber of Socket.IO server
+// The emodule uses the gateway to register and obtain a public URL
+var GATEWAY  = 'http://localhost:8800';
+// TODO make this configurable from Tao
+var SEED = 'WebRemote module';
+
 var express = require('express'),
     app = express(),
     http = require('http'),
     util = require('util'),
-    server = http.createServer(app);
+    server = http.createServer(app),
+    prezat = require(PREZ_AT_JS_PATH);
 var io = null;
-
+var gwsocket = null;
 
 //
-// Start HTTP server and Socket.IO
+// Start HTTP server and Socket.IO (server)
 //
 
 var port = (typeof(HTTP_PORT) == 'undefined') ? 8000 : HTTP_PORT;
@@ -34,22 +43,12 @@ server.on('listening', function() {
     WEB_REMOTE_LOCAL_URL = 'http://' + addr + '/' + HTTP_PORT;
     console.log('WebRemote: Server started: ' + WEB_REMOTE_LOCAL_URL);
 
-    // If io is created before server is listening, it lorgs a warning in case
+    // If io is created before server is listening, it logs a warning in case
     // the port is not available.
     io = require('socket.io').listen(server);
     io.set('log level', 1);
     io.sockets.on('connection', function(socket) {
-        socket.emit('pagenames', pageNames);
-        socket.emit('currentpage', currentPage);
-        socket.on('next', function() {
-            process.stdout.write('tao.next_page\n');
-        });
-        socket.on('prev', function() {
-            process.stdout.write('tao.previous_page\n');
-        });
-        socket.on('gotopage', function(n) {
-            process.stdout.write('tao.goto_page page_name ' + n +' ; refresh 0\n');
-        });
+        addHandlers(socket);
     });
 
     console.log('tao.WEB_REMOTE_LOCAL_PORT := ' + HTTP_PORT);
@@ -87,7 +86,9 @@ var currentPage = 1;
 function setCurrentPage(pagenum) {
     currentPage = pagenum;
     if (io)
-        io.sockets.emit('currentpage', currentPage);
+        io.sockets.emit(':currentpage', currentPage);
+    if (gwsocket)
+        gwsocket.emit(':currentpage', currentPage);
 }
 
 // Page 0 is not used
@@ -98,7 +99,9 @@ function setPageName(pagenum, pagename) {
 
 function sendPageNames() {
     if (io)
-        io.sockets.emit('pagenames', pageNames);
+        io.sockets.emit(':pagenames', pageNames);
+    if (gwsocket)
+        gwsocket.emit(':pagenames', pageNames);
 }
 
 process.stdin.resume();
@@ -109,6 +112,27 @@ process.stdin.on('data', function(chunk) {
     eval(buffer);
 });
 
+//
+// Connect to the public gateway
+//
+
+if (typeof(GATEWAY) !== 'undefined') {
+
+    prezat.connectToPrezGateway(GATEWAY, SEED, port, function(err, socket, publicUrl) {
+        console.log('Public url is ' + publicUrl);
+        gwsocket = socket;
+        // For user messages forwarded from gateway
+        addHandlers(socket);
+
+        socket.on('newclientconnection', function(param, callback) {
+            // A new client has connected to the gateway, it needs
+            // page information
+            var notifications = [ {name: ':pagenames', value: pageNames},
+                                  {name: ':currentpage', value: currentPage } ];
+            callback(notifications);
+        });
+    });
+}
 
 //
 // Helper functions
@@ -131,4 +155,19 @@ function getLocalIp() {
         }
     }
     return 'localhost';
+}
+
+// Handle client messages
+function addHandlers(socket) {
+    socket.emit(':pagenames', pageNames);
+    socket.emit(':currentpage', currentPage);
+    socket.on(':next', function() {
+        process.stdout.write('tao.next_page\n');
+    });
+    socket.on(':prev', function() {
+        process.stdout.write('tao.previous_page\n');
+    });
+    socket.on(':gotopage', function(n) {
+        process.stdout.write('tao.goto_page page_name ' + n +' ; refresh 0\n');
+    });
 }
