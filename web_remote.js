@@ -81,15 +81,18 @@ server.listen(port);
 // Define routing for HTTP requests
 //
 
+var maxAge = 60 * 1000; // 1 minute
+
 app.get('/',
         function(req, rsp) {
+            rsp.setHeader('Cache-Control', 'public, max-age=' + maxAge);
             rsp.sendfile(__dirname + '/static/web_remote.html');
         });
 app.configure(function(){
     app.use(express.methodOverride());
     app.use(express.bodyParser());
-    app.use('/thumbnails', express.static(DOCUMENT_DIR + '/thumbnails'));
-    app.use('/static', express.static(__dirname + '/static'));
+    app.use('/thumbnails', express.static(DOCUMENT_DIR + '/thumbnails', { maxAge: maxAge }));
+    app.use('/static', express.static(__dirname + '/static', { maxAge: maxAge }));
     app.use(express.errorHandler({
         dumpExceptions: true,
         showStack: true
