@@ -49,7 +49,12 @@
             socket.on(':currentpage', function(p) {
                 document.getElementById('CurrentPageThumbnail').innerHTML = '<img width="200px" class="main_thumbnail" src="thumbnails/page' + p + '.jpg#' + updateCount + '" />';
                 document.getElementById('CurrentPageCaption').innerHTML = p + '. ' + pageNames[p];
-                updateThumbnails(p);
+                for (var i = 1; i < pageNames.length; i++) {
+                    var cname = 'thumbnail';
+                    if (i === p)
+                        cname = 'hl_' + cname;
+                    document.getElementById('thumbimg' + i).className = cname;
+                }
             });
             var updateCount = 0;
             socket.on(':pagenames', function(names) {
@@ -71,7 +76,7 @@
                         thumb += "hl_";
                     thumb += 'thumbnail" src="thumbnails/page' + i
                            + '.jpg#' + updateCount + '" title="Page ' + i + ': ' + pageNames[i]
-                           + '" /></a>';
+                           + '" id="thumbimg' + i + '" /></a>';
                 }
                 document.getElementById('Thumbnails').innerHTML = thumb;
             }
@@ -80,7 +85,7 @@
     <body>
         <center>
         <table>
-            <tr>
+            <tr height="200px">
                 <td align="right">
                     <a href='#' onClick="prevPage();">
                         <img title="Go to previous page" width="40px" src="static/left.jpg" />
