@@ -10,7 +10,7 @@
 # (C) 2013 Taodyne SAS
 # ******************************************************************************
 
-!build_pass:!system(bash -c \"npm -v >/dev/null\") {
+!build_pass:!system(bash -c \"npm -v\" >/dev/null) {
   error(npm not found. Did you install NodeJS? \
         [\'sudo apt-get install nodejs\' or \'sudo port install nodejs\' \
         or from http://nodejs.org/])
@@ -21,7 +21,7 @@ MODINSTDIR = web_remote
 include(../modules.pri)
 
 OTHER_FILES = web_remote.xl
-OTHER_FILES += web_remote.js static/web_remote.html doc/web_remote.doxy.h doc/Doxyfile.in
+OTHER_FILES += doc/web_remote.doxy.h doc/Doxyfile.in
 
 # Icon from: http://www.iconspedia.com/icon/iphone-12112.html
 # Author: Archigraphs, http://www.archigraphs.com/
