@@ -12,7 +12,7 @@ module_description
     import_name "WebRemote"
     author "Taodyne SAS"
     website "http://www.taodyne.com"
-    version 1.01
+    version 1.0
 
 module_description "fr",
     name "Télécommande Web"
@@ -77,7 +77,7 @@ web_remote_start ->
         cached 1.0,
             for i in 1..page_count loop
                 writeln "WebRemote: making thumbnail " & text i & "/" & text page_count
-                save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".jpg", 10.0
+                save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".jpg", 3.0
                 nodejs_writeln "setPageName(" & text i & ", '" & text_replace(page_name i, "'", "\'") & "');"
             // In case a client has connected before this point
             nodejs_writeln "sendPageNames();"
