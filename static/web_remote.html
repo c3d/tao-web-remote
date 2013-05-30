@@ -70,13 +70,16 @@
             function updateThumbnails(highlighted) {
                 var thumb = '';
                 for (var i = 1; i < pageNames.length; i++) {
-                    thumb += '<a href="javascript:void(0);" onclick="gotoPage('
+                    thumb += '<div style="display:inline-block; width:180px; text-align:center; font-size:80%">'
+                           + '<a href="javascript:void(0);" onclick="gotoPage('
                            + i + ');"><img class="'
                     if (i === highlighted)
                         thumb += "hl_";
                     thumb += 'thumbnail" src="thumbnails/page' + i
                            + '.jpg#' + updateCount + '" title="Page ' + i + ': ' + pageNames[i]
-                           + '" id="thumbimg' + i + '" /></a>';
+                           + '" id="thumbimg' + i + '" style="padding-bottom:0.5em;" /></a>'
+                           + i + '. ' + pageNames[i]
+                           + '</div>';
                 }
                 document.getElementById('Thumbnails').innerHTML = thumb;
             }
