@@ -1,5 +1,5 @@
 @INCLUDE = ../../Doxyfile
 PROJECT_NAME = \"Web Remote Control\"
-PROJECT_NUMBER = 1.02
-QHP_NAMESPACE = com.taodyne.TaoPresentations.modules.WebRemote.1.02
+PROJECT_NUMBER = 1.01
+QHP_NAMESPACE = com.taodyne.TaoPresentations.modules.WebRemote.1.01
 QHP_VIRTUAL_FOLDER = WebRemote
