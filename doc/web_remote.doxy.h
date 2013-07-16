@@ -1,15 +1,15 @@
 /**
  * @~english
  * @taomoduledescription{WebRemote, Web Remote Control}
- * <tt>import WebRemote</tt> - Control presentations from a web browser
- * (computer, tablet, smartphone).@n
+ *
+ * Control presentations from a web browser (computer, tablet, smartphone)
  *
  * @endtaomoduledescription{WebRemote}
  *
  * @~french
  * @taomoduledescription{WebRemote, Télécommande Web}
- * <tt>import WebRemote</tt> - Télécommandez vos présentations depuis un
- * navigateur web (ordinateur, tablette, smartphone).@n
+ *
+ * Télécommandez vos présentations depuis un navigateur web (ordinateur, tablette, smartphone) 
  *
  * @endtaomoduledescription{WebRemote}
  *
