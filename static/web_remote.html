@@ -64,11 +64,6 @@
                 updateCount++;
                 updateThumbnails(currentPage);
             });
-            socket.on(':prompt', function(prompt) {
-                if (prompt.trim().length === 0)
-                    prompt = "&nbsp;"; // Empty line to preserve page layout
-                document.getElementById('CurrentPagePromptString').innerHTML = prompt;
-            });
             function nextPage() { socket.emit(':next'); }
             function prevPage() { socket.emit(':prev'); }
             function gotoPage(n) { socket.emit(':gotopage', n); }
@@ -108,9 +103,6 @@
             </tr>
             <tr>
                 <td colspan="3" align="center" id="CurrentPageCaption" />
-            </tr>
-            <tr>
-                <td colspan="3" align="center" id="CurrentPagePromptString">&nbsp;</td>
             </tr>
         </table>
         <br />
