@@ -48,7 +48,7 @@ server.on('listening', function() {
 
     var addr = getLocalIp();
     port = server.address().port;
-    var localUrl = 'http://' + addr + '/' + port;
+    var localUrl = 'http://' + addr + ':' + port;
     console.log('tao.' + LOCAL_CB + ' ' + port + ', "' + localUrl + '"');
 
     // Connect to the public gateway
@@ -125,6 +125,11 @@ function sendPageNames() {
         io.sockets.emit(':pagenames', pageNames);
     if (gwsocket)
         gwsocket.emit(':pagenames', pageNames);
+}
+
+function sendPrompt(prompt) {
+    if (io)
+        io.sockets.emit(':prompt', prompt)
 }
 
 process.stdin.resume();
