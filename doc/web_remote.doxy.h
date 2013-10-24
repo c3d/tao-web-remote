@@ -5,7 +5,7 @@
  * (computer, tablet, smartphone).@n
  *
  * Example
-@code
+ * @code
 // Open this document and point your web browser/mobile phone/tablet
 // to the URL printed on the console. Pressing the the space bar will
 // also show the URL in the main Tao window.
@@ -55,7 +55,7 @@ locally
             vertical_align_bottom
             color "black"
             text Msg
-@endcode
+ * @endcode
  *
  * @image html web_remote.png
  *
@@ -68,7 +68,7 @@ locally
  *
  * Exemple
  *
-@code
+ * @code
 // Ouvrez ce document et connectez votre navigateur/téléphone/tablette
 // à l'adresse indiquée sur la console. Ou tapez <Espace> pour afficher
 // l'adresse dans la fenêtre principale.
@@ -119,7 +119,7 @@ locally
             vertical_align_bottom
             color "black"
             text Msg
-@endcode
+ * @endcode
  *
  * @image html web_remote_fr.png
  *
