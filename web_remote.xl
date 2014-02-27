@@ -12,7 +12,7 @@ module_description
     import_name "WebRemote"
     author "Taodyne SAS"
     website "http://www.taodyne.com"
-    version 1.01
+    version 1.02
 
 module_description "fr",
     name "Télécommande Web"
@@ -89,3 +89,9 @@ wrs_local_cb Port:integer, LocalUrl:text ->
 wrs_public_cb PublicUrl:text ->
     writeln "WebRemote: public address is " & PublicUrl
     WEB_REMOTE_PUBLIC_URL := PublicUrl
+
+wp_string -> ""
+web_prompt T:text ->
+    if wp_string != T then
+        nodejs_writeln "sendPrompt('" & text_replace(T, "'", "\'") & "');"
+        wp_string := T
