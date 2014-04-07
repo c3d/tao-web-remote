@@ -70,18 +70,14 @@ web_remote_start ->
         nodejs js_src
     on "pagechange",
         nodejs_writeln "setCurrentPage(" & text page_number & ");"
-        if transition_ratio = 0.0 then
-            writeln "WebRemote: Updating thumbnail " & text page_number & "/" & text page_count
-            screenshot document_dir & "/thumbnails/page" & text page_number & ".jpg"
-            // save_page_thumbnail 160, 120, -1, document_dir & "/thumbnails/page" & text page_number & ".jpg", 10.0
     if wrs_count <= 2 then
         wrs_count := wrs_count + 1
         refresh 0
     if wrs_count = 2 then
         cached 1.0,
             for i in 1..page_count loop
-                writeln "WebRemote: setting page name " & text i & "/" & text page_count
-                // save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".jpg", 10.0
+                writeln "WebRemote: making thumbnail " & text i & "/" & text page_count
+                save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".jpg", 10.0
                 nodejs_writeln "setPageName(" & text i & ", '" & text_replace(page_name i, "'", "\'") & "');"
             // In case a client has connected before this point
             nodejs_writeln "sendPageNames();"
