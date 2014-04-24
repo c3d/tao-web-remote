@@ -13,26 +13,40 @@
             {
                 border: 6px solid rgb(226, 217, 192);
                 margin:2px;
+                width:240px;
             }
             img.thumbnail
             {
                 border: 6px solid rgb(226, 217, 192);
                 margin:2px;
+                width:160px;
             }
             img.thumbnail:hover
             {
                 border: 6px solid rgb(61, 154, 186);
                 margin:2px;
+                width:160px;
             }
             img.hl_thumbnail
             {
                 border: 6px solid rgb(166, 61, 59);
                 margin:2px;
+                width:160px;
             }
             img.hl_thumbnail:hover
             {
                 border: 6px solid rgb(61, 154, 186);
                 margin:2px;
+                width:160px;
+            }
+            div.caption
+            {
+                display:inline-block;
+                width:180px;
+                height: 160px;
+                text-align:center;
+                vertical-align: top;
+                font-size:80%"
             }
         </style>
         <script src="/socket.io/socket.io.js"></script>
@@ -75,14 +89,14 @@
             function updateThumbnails(highlighted) {
                 var thumb = '';
                 for (var i = 1; i < pageNames.length; i++) {
-                    thumb += '<div style="display:inline-block; width:180px; text-align:center; font-size:80%">'
+                    thumb += '<div class="caption">'
                            + '<a href="javascript:void(0);" onclick="gotoPage('
                            + i + ');"><img class="'
                     if (i === highlighted)
                         thumb += "hl_";
                     thumb += 'thumbnail" src="thumbnails/page' + i
                            + '.jpg#' + updateCount + '" title="Page ' + i + ': ' + pageNames[i]
-                           + '" id="thumbimg' + i + '" style="padding-bottom:0.5em;" /></a>'
+                           + '" id="thumbimg' + i + '" /></a>'
                            + i + '. ' + pageNames[i]
                            + '</div>';
                 }
