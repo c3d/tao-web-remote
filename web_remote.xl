@@ -1,8 +1,23 @@
-// WebRemote module definition
-//
-// Control presentations from a web browser (computer, tablet, smartphone) 
-//
-// Copyright 2013 Taodyne SAS
+// ****************************************************************************
+//  web_remote.xl                                                  Tao project 
+// ****************************************************************************
+// 
+//   File Description:
+// 
+//    Web interface to let you control a presentation from a web browser
+//    (computer, tablet, smartphone)
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// ****************************************************************************
+//  (C) 2014 Christophe de Dinechin <christophe@taodyne.com>
+//  (C) 2013 Jerome Forissier <jerome@taodyne.com>
+//  (C) 2013-2014 Taodyne SAS
+// ****************************************************************************
 
 module_description
     id "2EA5CF1D-5126-4966-ACF4-9916391F5689" 
@@ -60,27 +75,51 @@ wrs_js_src := "var DOCUMENT_DIR='" & document_dir & "'; var HTTP_PORT=" & text W
 wrs_js_src := wrs_js_src & " var PREZ_AT_JS_PATH='" & prez_at_js_path & "';"
 wrs_js_src := wrs_js_src & " require('" & module_dir & "/web_remote.js');"
 js_src := ""
-wrs_count -> 0
+
+webremote_start_count -> 0
+webremote_need_thumbnail -> 3.0
+webremote_refresh_factor -> 0.0
+webremote_thumbnail_time -> 5.15
+webremote_thumbnail_time Time -> webremote_thumbnail_time := Time
+
 web_remote_start ->
+// ----------------------------------------------------------------------------
+//   Initialize the web remote
+// ----------------------------------------------------------------------------
     locally
         js_src := "var GATEWAY_URL='" & WEB_REMOTE_GATEWAY_URL & "'; "
         js_src := js_src & "var SEED='" & WEB_REMOTE_SEED & "'; "
         js_src := js_src & "var LOCAL_CB='" & WEB_REMOTE_LOCAL_URL_CB & "'; "
         js_src := js_src & "var PUBLIC_CB='" & WEB_REMOTE_PUBLIC_URL_CB & "'; " & wrs_js_src
         nodejs js_src
+
+    locally
+        layout "WebRemote-Thumbnails"
+        if webremote_need_thumbnail > 0 then
+            webremote_need_thumbnail := webremote_need_thumbnail - webremote_refresh_factor * refresh_time
+            webremote_refresh_factor := 1.0
+            if webremote_need_thumbnail <= 0 then
+                writeln "WebRemote: Updating thumbnail " & page_number & "/" & page_count
+                screenshot document_dir & "/thumbnails/page" & page_number & ".jpg"
+            else
+                refresh webremote_need_thumbnail
+
     on "pagechange",
         nodejs_writeln "setCurrentPage(" & text page_number & ");"
         if transition_ratio = 0.0 then
-            writeln "WebRemote: Updating thumbnail " & text page_number & "/" & text page_count
-            screenshot document_dir & "/thumbnails/page" & text page_number & ".jpg"
-            // save_page_thumbnail 160, 120, -1, document_dir & "/thumbnails/page" & text page_number & ".jpg", 10.0
-    if wrs_count <= 2 then
-        wrs_count := wrs_count + 1
+            webremote_need_thumbnail := webremote_thumbnail_time
+            webremote_refresh_factor := 0.0
+            webremote_thumbnail_time := 5.15
+            refresh_also "WebRemote-Thumbnails"
+            writeln "Setting up thumbnail capture at ", webremote_need_thumbnail
+
+    if webremote_start_count <= 2 then
+        webremote_start_count := webremote_start_count + 1
         refresh 0
-    if wrs_count = 2 then
+    if webremote_start_count = 2 then
         cached 1.0,
             for i in 1..page_count loop
-                writeln "WebRemote: setting page name " & text i & "/" & text page_count
+                // writeln "WebRemote: setting page name " & text i & "/" & text page_count
                 // save_page_thumbnail 160, 120, i, document_dir & "/thumbnails/page" & text i & ".jpg", 10.0
                 nodejs_writeln "setPageName(" & text i & ", '" & text_replace(page_name i, "'", "\'") & "');"
             // In case a client has connected before this point
