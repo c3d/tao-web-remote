@@ -71,7 +71,8 @@ import NodeJS
 import PrezAt
 
 // #2618 module_dir is OK here but not if called from within web_remote_start
-wrs_js_src := "var DOCUMENT_DIR='" & document_dir & "'; var HTTP_PORT=" & text WEB_REMOTE_LOCAL_PORT & ";"
+javascript_document_dir -> text_replace(text_replace(document_dir, "\", "\\"), "'", "\'")
+wrs_js_src := "var DOCUMENT_DIR='" & javascript_document_dir & "'; var HTTP_PORT=" & text WEB_REMOTE_LOCAL_PORT & ";"
 wrs_js_src := wrs_js_src & " var PREZ_AT_JS_PATH='" & prez_at_js_path & "';"
 wrs_js_src := wrs_js_src & " require('" & module_dir & "/web_remote.js');"
 js_src := ""
