@@ -101,7 +101,7 @@ web_remote_start ->
             webremote_refresh_factor := 1.0
             if webremote_need_thumbnail <= 0 then
                 writeln "WebRemote: Updating thumbnail " & page_number & "/" & page_count
-                screenshot document_dir & "/thumbnails/page" & page_number & ".jpg"
+                screenshot document_dir & "/thumbnails/page" & page_number & ".jpg", 20%
             else
                 refresh webremote_need_thumbnail
 
